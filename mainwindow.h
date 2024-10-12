@@ -4,16 +4,13 @@
 #include <QMainWindow>
 #include <QApplication>
 #include <QListWidget>
-#include <QStackedWidget>
-#include <QVBoxLayout>
-#include <QWidget>
-#include <QLabel>
-#include <QSplitter>
+#include <QTextBrowser>
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QDebug>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,18 +27,25 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_BookmarkButton_clicked();
 
     void on_NextPageButton_clicked();
-
     void on_PreviousPageButton_clicked();
+
+    void on_menuExit_triggered();
+    void on_menuAbout_triggered();
+
+    void on_OpenBookmarks_clicked();
+    void on_BookmarkButton_clicked();
+
+    void on_NavigationItem_Selected(int currentRow);
+    void on_BookmarkItem_Selected(int currentRow);
 
 private:
     QListWidget* navigationList;
-    QStackedWidget* contentStack;
 
-    void initializeEmptyItems(int count);
+    QString loadTextFromFile(const QString& filePath);
     bool loadDataFromFile(const QString& fileName);
+    bool showingBookmarks = false;
 
     Ui::MainWindow *ui;
 };

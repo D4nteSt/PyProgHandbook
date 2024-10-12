@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>texts/introduction.html</file>
+        <file>texts/Test1.html</file>
+        <file>texts/Test2.html</file>
+        <file>texts/Test3.html</file>
+        <file>data.json</file>
+    </qresource>
+</RCC>

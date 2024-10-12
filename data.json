@@ -1,14 +1,18 @@
 [
     {
+        "title": "Введение",
+        "filePath": ":/texts/introduction.html"
+    },
+    {
         "title": "Элемент 1",
-        "content": "Это текст для элемента 1, который будет отображаться в правой части окна."
+        "filePath": ":/texts/Test1.html"
     },
     {
         "title": "Элемент 2",
-        "content": "Текст для элемента 2 с описанием или информацией."
+        "filePath": ":/texts/Test2.html"
     },
     {
         "title": "Элемент 3",
-        "content": "Это содержимое для третьего элемента."
+        "filePath": ":/texts/Test3.html"
     }
 ]
