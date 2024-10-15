@@ -11,6 +11,8 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QDebug>
+#include <QPair>
+#include <QVector>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -34,18 +36,21 @@ private slots:
     void on_menuExit_triggered();
     void on_menuAbout_triggered();
 
-    void on_OpenBookmarks_clicked();
+    void on_OpenBookmarksButton_clicked();
     void on_BookmarkButton_clicked();
 
-    void on_NavigationItem_Selected(int currentRow);
-    void on_BookmarkItem_Selected(int currentRow);
+    void onNavigationItemSelected(int currentRow);
 
 private:
     QListWidget* navigationList;
 
     QString loadTextFromFile(const QString& filePath);
     bool loadDataFromFile(const QString& fileName);
-    bool showingBookmarks = false;
+    void restoreNavigationList();
+    void showBookmarkList();
+
+    QVector<QPair<QString, QString>> bookmarks;
+    bool showingBookmarks;
 
     Ui::MainWindow *ui;
 };

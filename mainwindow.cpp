@@ -8,7 +8,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 {
     ui->setupUi(this);
-    ui->navigationList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    //ui->navigationList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     if (!loadDataFromFile(":/data.json"))
     {
@@ -16,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
         return;
     }
 
+   // connect(ui->OpenBookmarksButton, &QPushButton, this, &MainWindow::on_OpenBookmarks_clicked);
     connect(ui->navigationList, &QListWidget::currentRowChanged, this, &MainWindow::onNavigationItemSelected);
 
     if (ui->navigationList->count() > 0)
@@ -60,7 +61,7 @@ bool MainWindow::loadDataFromFile(const QString& fileName)
 }
 
 //Слот, вызываемый при выборе элемента из списка
-void MainWindow::on_NavigationItem_Selected(int currentRow)
+void MainWindow::onNavigationItemSelected(int currentRow)
 {
     QListWidgetItem* currentItem = ui->navigationList->item(currentRow);
     if (!currentItem)
@@ -93,33 +94,95 @@ QString MainWindow::loadTextFromFile(const QString &filePath)
     return fileContent;
 }
 
+void MainWindow::showBookmarkList()
+{
+    ui->navigationList->clear();
+
+    for (const auto& bookmark : bookmarks)
+    {
+        QListWidgetItem* item = new QListWidgetItem(bookmark.first);
+        item->setData(Qt::UserRole, bookmark.second);
+        ui->navigationList->addItem(item);
+    }
+}
+
+void MainWindow::restoreNavigationList()
+{
+    ui->navigationList->clear();
+
+    loadDataFromFile(":/data.json");
+}
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
 
+void MainWindow::on_OpenBookmarksButton_clicked()
+{
+    if (showingBookmarks)
+    {
+        restoreNavigationList();
+        showingBookmarks = false;
+        ui->OpenBookmarksButton->setText("Показать закладки");
+    }
+    else
+    {
+        showBookmarkList();
+        showingBookmarks = true;
+        ui->OpenBookmarksButton->setText("Скрыть закладки");
+    }
+}
+
+
 void MainWindow::on_BookmarkButton_clicked()
 {
+    int currentRow = ui->navigationList->currentRow();
+    if (currentRow >= 0)
+    {
+        QListWidgetItem* currentItem = ui->navigationList->item(currentRow);
+        if (currentItem)
+        {
+            QString title = currentItem->text();
+            QString filePath = currentItem->data(Qt::UserRole).toString();
 
+            bool alreadyBookmarked = false;
+            for (const auto& bookmark : bookmarks)
+            {
+                if (bookmark.second == filePath)
+                {
+                    alreadyBookmarked = true;
+                    break;
+                }
+            }
+
+            if (!alreadyBookmarked)
+            {
+                bookmarks.append(qMakePair(title, filePath));
+                qDebug() << "Закладка добавлена: " << title;
+            }
+        }
+    }
 }
 
 
 void MainWindow::on_NextPageButton_clicked()
 {
-
+    int currentRow = ui->navigationList->currentRow();
+    if (currentRow < ui->navigationList->count() - 1)
+    {
+        ui->navigationList->setCurrentRow(currentRow + 1);
+    }
 }
 
 
 void MainWindow::on_PreviousPageButton_clicked()
 {
-
-}
-
-
-void MainWindow::on_OpenBookmarks_clicked()
-{
-
+    int currentRow = ui->navigationList->currentRow();
+    if (currentRow > 0)
+    {
+        ui->navigationList->setCurrentRow(currentRow - 1);
+    }
 }
 
 void MainWindow::on_menuExit_triggered()
@@ -131,7 +194,6 @@ void MainWindow::on_menuExit_triggered()
     msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
     msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
     int answer = msgbox.exec();
-        //QMessageBox::warning(this, ("Выход"), ("Вы уверены, что хотите выйти?"), QMessageBox::Yes | QMessageBox::Cancel);
 
     switch (answer) {
     case QMessageBox::Yes:
@@ -152,10 +214,7 @@ void MainWindow::on_menuAbout_triggered()
     msgbox.setWindowTitle("О программе");
     msgbox.setIcon(QMessageBox::Information);
     msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
-    msgbox.exec();
-        //QMessageBox::information(this, ("О программе"), ("Эта программа представляет из себя справочник по языку программирования Python для начинающих, сделанный в рамках учебной практики."));
-
+    msgbox.exec();       
 }
-
 
 

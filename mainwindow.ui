@@ -33,6 +33,13 @@
       <property name="spacing">
        <number>10</number>
       </property>
+      <item row="0" column="1" colspan="3">
+       <widget class="QTextBrowser" name="textBrowser">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(240, 240, 240);</string>
+        </property>
+       </widget>
+      </item>
       <item row="1" column="3">
        <widget class="QPushButton" name="NextPageButton">
         <property name="sizePolicy">
@@ -87,7 +94,7 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QPushButton" name="OpenBookmarks">
+       <widget class="QPushButton" name="OpenBookmarksButton">
         <property name="font">
          <font>
           <family>Inter var</family>
@@ -103,7 +110,7 @@
 </string>
         </property>
         <property name="text">
-         <string>Открыть закладки</string>
+         <string>Показать закладки</string>
         </property>
        </widget>
       </item>
@@ -147,13 +154,6 @@
         </property>
         <property name="autoScroll">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" colspan="3">
-       <widget class="QTextBrowser" name="textBrowser">
-        <property name="styleSheet">
-         <string notr="true">background-color: rgb(240, 240, 240);</string>
         </property>
        </widget>
       </item>
