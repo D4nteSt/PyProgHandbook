@@ -9,6 +9,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QCoreApplication>
 #include <QMessageBox>
 #include <QDebug>
 #include <QPair>
@@ -48,6 +49,8 @@ private:
     bool loadDataFromFile(const QString& fileName);
     void restoreNavigationList();
     void showBookmarkList();
+    void saveBookmarksToFile();
+    void loadBookmarksFromFile();
 
     QVector<QPair<QString, QString>> bookmarks;
     bool showingBookmarks;

@@ -8,7 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 {
     ui->setupUi(this);
-    //ui->navigationList->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+    loadBookmarksFromFile();
 
     if (!loadDataFromFile(":/data.json"))
     {
@@ -16,7 +17,6 @@ MainWindow::MainWindow(QWidget *parent)
         return;
     }
 
-   // connect(ui->OpenBookmarksButton, &QPushButton, this, &MainWindow::on_OpenBookmarks_clicked);
     connect(ui->navigationList, &QListWidget::currentRowChanged, this, &MainWindow::onNavigationItemSelected);
 
     if (ui->navigationList->count() > 0)
@@ -24,6 +24,77 @@ MainWindow::MainWindow(QWidget *parent)
         ui->navigationList->setCurrentRow(0);
     }
 }
+
+MainWindow::~MainWindow()
+{
+    saveBookmarksToFile();
+    delete ui;
+}
+
+//Функция загрузки файла с сохраненными закладками
+void MainWindow::saveBookmarksToFile()
+{
+    QString filePath = QCoreApplication::applicationDirPath() + "/bookmarks.json";
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+    {
+        qDebug() << "Не удалось открыть файл для записи:" << file.errorString();
+        return;
+    }
+
+    QJsonArray jsonArray;
+    for (const auto& bookmark : bookmarks)
+    {
+        QJsonObject obj;
+        obj["title"] = bookmark.first;
+        obj["filePath"] = bookmark.second;
+        jsonArray.append(obj);
+    }
+
+    QJsonDocument jsonDoc(jsonArray);
+    file.write(jsonDoc.toJson());
+    file.close();
+
+    qDebug() << "Закладки успешно сохранены в" << filePath;
+}
+
+//Функция загрузки закладок из файла
+void MainWindow::loadBookmarksFromFile()
+{
+    QString filePath = QCoreApplication::applicationDirPath() + "/bookmarks.json";
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Не удалось открыть файл для чтения:" << file.errorString();
+        return;
+    }
+
+    QByteArray fileData = file.readAll();
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(fileData);
+    file.close();
+
+    if (!jsonDoc.isArray())
+    {
+        qDebug() << "Файл закладок не является JSON массивом";
+        return;
+    }
+
+    QJsonArray jsonArray = jsonDoc.array();
+    bookmarks.clear();
+
+    for (int i = 0; i < jsonArray.size(); ++i)
+    {
+        QJsonObject obj = jsonArray[i].toObject();
+        QString title = obj["title"].toString();
+        QString filePath = obj["filePath"].toString();
+        bookmarks.append(qMakePair(title, filePath));
+    }
+
+    qDebug() << "Закладки успешно загружены из" << filePath;
+}
+
 // Функция для загрузки данных из JSON файла
 bool MainWindow::loadDataFromFile(const QString& fileName)
 {
@@ -94,6 +165,7 @@ QString MainWindow::loadTextFromFile(const QString &filePath)
     return fileContent;
 }
 
+//Функция для вывода списка закладок в навигационное меню
 void MainWindow::showBookmarkList()
 {
     ui->navigationList->clear();
@@ -106,6 +178,7 @@ void MainWindow::showBookmarkList()
     }
 }
 
+//Функция для восстановления всех элементов в навигационном меню при скрытии закладок
 void MainWindow::restoreNavigationList()
 {
     ui->navigationList->clear();
@@ -113,11 +186,7 @@ void MainWindow::restoreNavigationList()
     loadDataFromFile(":/data.json");
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-}
-
+//Слот для кнопки открытия списка закладок
 void MainWindow::on_OpenBookmarksButton_clicked()
 {
     if (showingBookmarks)
@@ -125,16 +194,18 @@ void MainWindow::on_OpenBookmarksButton_clicked()
         restoreNavigationList();
         showingBookmarks = false;
         ui->OpenBookmarksButton->setText("Показать закладки");
+        ui->BookmarkButton->setText("Добавить в закладки");
     }
     else
     {
         showBookmarkList();
         showingBookmarks = true;
         ui->OpenBookmarksButton->setText("Скрыть закладки");
+        ui->BookmarkButton->setText("Удалить из закладок");
     }
 }
 
-
+//Слот для кнопки добавления/удаления закладки
 void MainWindow::on_BookmarkButton_clicked()
 {
     int currentRow = ui->navigationList->currentRow();
@@ -147,11 +218,14 @@ void MainWindow::on_BookmarkButton_clicked()
             QString filePath = currentItem->data(Qt::UserRole).toString();
 
             bool alreadyBookmarked = false;
-            for (const auto& bookmark : bookmarks)
+            int bookmarkIndex = -1;
+
+            for (int i = 0; i < bookmarks.size(); ++i)
             {
-                if (bookmark.second == filePath)
+                if (bookmarks[i].second == filePath)
                 {
                     alreadyBookmarked = true;
+                    bookmarkIndex = i;
                     break;
                 }
             }
@@ -161,11 +235,18 @@ void MainWindow::on_BookmarkButton_clicked()
                 bookmarks.append(qMakePair(title, filePath));
                 qDebug() << "Закладка добавлена: " << title;
             }
+
+            else if (showingBookmarks)
+            {
+                bookmarks.removeAt(bookmarkIndex);
+                delete ui->navigationList->takeItem(currentRow);
+                qDebug() << "Закладка удалена: " << title;
+            }
         }
     }
 }
 
-
+//Слот для кнопки следующей страницы
 void MainWindow::on_NextPageButton_clicked()
 {
     int currentRow = ui->navigationList->currentRow();
@@ -175,7 +256,7 @@ void MainWindow::on_NextPageButton_clicked()
     }
 }
 
-
+//Слот для кнопки предыдущей страницы
 void MainWindow::on_PreviousPageButton_clicked()
 {
     int currentRow = ui->navigationList->currentRow();
@@ -203,9 +284,7 @@ void MainWindow::on_menuExit_triggered()
     case QMessageBox::Cancel:
         break;
     }
-
 }
-
 
 void MainWindow::on_menuAbout_triggered()
 {
