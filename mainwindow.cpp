@@ -18,11 +18,15 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     connect(ui->navigationList, &QListWidget::currentRowChanged, this, &MainWindow::onNavigationItemSelected);
+    connect(ui->navigationList, &QListWidget::currentRowChanged, this, &MainWindow::updateNavigationButtons);
 
     if (ui->navigationList->count() > 0)
     {
         ui->navigationList->setCurrentRow(0);
+        updateNavigationButtons();
+        updateBookmarkButton();
     }
+
 }
 
 MainWindow::~MainWindow()
@@ -131,6 +135,22 @@ bool MainWindow::loadDataFromFile(const QString& fileName)
     return true;
 }
 
+//Функция для загрузки содержимого css файла
+QString MainWindow::loadStyleSheetFromFile(const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        qDebug() << "Не удалось открыть CSS файл: " << file.errorString();
+        return "";
+    }
+
+    QString cssContent = file.readAll();
+    file.close();
+
+    return cssContent;
+}
+
 //Слот, вызываемый при выборе элемента из списка
 void MainWindow::onNavigationItemSelected(int currentRow)
 {
@@ -142,11 +162,16 @@ void MainWindow::onNavigationItemSelected(int currentRow)
 
     QString filePath = currentItem->data(Qt::UserRole).toString();
     QString fileContent = loadTextFromFile(filePath);
+    QString cssContent = loadStyleSheetFromFile(":/style.css");
 
     if (!fileContent.isEmpty())
     {
         ui->textBrowser->setHtml(fileContent);
+        ui->textBrowser->setStyleSheet(cssContent);
     }
+
+    updateNavigationButtons();
+    updateBookmarkButton();
 }
 
 //Функция для загрузки текста из файла
@@ -176,6 +201,17 @@ void MainWindow::showBookmarkList()
         item->setData(Qt::UserRole, bookmark.second);
         ui->navigationList->addItem(item);
     }
+
+    if (ui->navigationList->count() > 0)
+    {
+        ui->navigationList->setCurrentRow(0);
+    }
+
+    if (bookmarks.isEmpty())
+    {
+        ui->textBrowser->setText("Пока закладок нет...");
+        return;
+    }
 }
 
 //Функция для восстановления всех элементов в навигационном меню при скрытии закладок
@@ -184,9 +220,14 @@ void MainWindow::restoreNavigationList()
     ui->navigationList->clear();
 
     loadDataFromFile(":/data.json");
+
+    if (ui->navigationList->count() > 0)
+    {
+        ui->navigationList->setCurrentRow(0);
+    }
 }
 
-//Слот для кнопки открытия списка закладок
+//Слот для кнопки открытия/скрытия списка закладок
 void MainWindow::on_OpenBookmarksButton_clicked()
 {
     if (showingBookmarks)
@@ -194,15 +235,15 @@ void MainWindow::on_OpenBookmarksButton_clicked()
         restoreNavigationList();
         showingBookmarks = false;
         ui->OpenBookmarksButton->setText("Показать закладки");
-        ui->BookmarkButton->setText("Добавить в закладки");
     }
     else
     {
         showBookmarkList();
         showingBookmarks = true;
         ui->OpenBookmarksButton->setText("Скрыть закладки");
-        ui->BookmarkButton->setText("Удалить из закладок");
     }
+    updateBookmarkButton();
+    updateNavigationButtons();
 }
 
 //Слот для кнопки добавления/удаления закладки
@@ -234,6 +275,16 @@ void MainWindow::on_BookmarkButton_clicked()
             {
                 bookmarks.append(qMakePair(title, filePath));
                 qDebug() << "Закладка добавлена: " << title;
+
+                QMessageBox msgbox;
+                msgbox.setText("Закладка успешно добавлена!");
+                msgbox.setWindowTitle("Внимание!");
+                msgbox.setIcon(QMessageBox::Information);
+                msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
+                msgbox.setStandardButtons(QMessageBox::Ok);
+                msgbox.exec();
+
+                updateBookmarkButton();
             }
 
             else if (showingBookmarks)
@@ -241,8 +292,94 @@ void MainWindow::on_BookmarkButton_clicked()
                 bookmarks.removeAt(bookmarkIndex);
                 delete ui->navigationList->takeItem(currentRow);
                 qDebug() << "Закладка удалена: " << title;
+
+                if (bookmarks.isEmpty())
+                {
+                    ui->textBrowser->setText("Пока закладок нет...");
+                }
+
+                QMessageBox msgbox;
+                msgbox.setText("Закладка успешно удалена!");
+                msgbox.setWindowTitle("Внимание!");
+                msgbox.setIcon(QMessageBox::Information);
+                msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
+                msgbox.setStandardButtons(QMessageBox::Ok);
+                msgbox.exec();
+
+                updateBookmarkButton();
             }
         }
+    }
+}
+
+//Функция обновления внешнего вида кнопок добавления/удаления закладок
+void MainWindow::updateBookmarkButton()
+{
+    int currentRow = ui->navigationList->currentRow();
+    if (currentRow < 0) {
+        return;
+    }
+
+    QListWidgetItem* currentItem = ui->navigationList->item(currentRow);
+    if (!currentItem) {
+        return;
+    }
+
+    QString filePath = currentItem->data(Qt::UserRole).toString();
+
+    bool alreadyBookmarked = false;
+    for (const auto& bookmark : bookmarks)
+    {
+        if (bookmark.second == filePath)
+        {
+            alreadyBookmarked = true;
+            break;
+        }
+    }
+
+    if (alreadyBookmarked && showingBookmarks)
+    {
+        ui->BookmarkButton->setText("Удалить из закладок");
+        ui->BookmarkButton->setEnabled(true);
+        ui->BookmarkButton->setStyleSheet("background-color: rgb(72, 61, 139); border-radius: 10px; border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+    }
+    else if (alreadyBookmarked && !showingBookmarks)
+    {
+        ui->BookmarkButton->setText("Добавить в закладки");
+        ui->BookmarkButton->setEnabled(false);
+        ui->BookmarkButton->setStyleSheet("background-color: #231e44; color: #a9a9a9; border-radius: 10px;");
+    }
+    else if (!alreadyBookmarked)
+    {
+        ui->BookmarkButton->setText("Добавить в закладки");
+        ui->BookmarkButton->setEnabled(true);
+        ui->BookmarkButton->setStyleSheet("background-color: rgb(72, 61, 139); border-radius: 10px; border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+    }
+}
+
+//Функция обновления внешнего вида навигационных кнопок
+void MainWindow::updateNavigationButtons()
+{
+    if (ui->navigationList->currentRow() > 0)
+    {
+        ui->PreviousPageButton->setEnabled(true);
+        ui->PreviousPageButton->setStyleSheet("background-color: rgb(125, 113, 216); border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+    }
+    else
+    {
+        ui->PreviousPageButton->setEnabled(false);
+        ui->PreviousPageButton->setStyleSheet("background-color: #231b62; color: #a9a9a9;");
+    }
+
+    if (ui->navigationList->currentRow() < ui->navigationList->count() - 1)
+    {
+        ui->NextPageButton->setEnabled(true);
+        ui->NextPageButton->setStyleSheet("background-color: rgb(125, 113, 216); border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+    }
+    else
+    {
+        ui->NextPageButton->setEnabled(false);
+        ui->NextPageButton->setStyleSheet("background-color: #231b62; color: #a9a9a9;");
     }
 }
 
@@ -254,6 +391,8 @@ void MainWindow::on_NextPageButton_clicked()
     {
         ui->navigationList->setCurrentRow(currentRow + 1);
     }
+
+    updateNavigationButtons();
 }
 
 //Слот для кнопки предыдущей страницы
@@ -264,6 +403,8 @@ void MainWindow::on_PreviousPageButton_clicked()
     {
         ui->navigationList->setCurrentRow(currentRow - 1);
     }
+
+    updateNavigationButtons();
 }
 
 void MainWindow::on_menuExit_triggered()

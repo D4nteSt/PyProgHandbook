@@ -10,6 +10,15 @@
     <height>860</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>800</width>
+    <height>600</height>
+   </size>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::ContextMenuPolicy::DefaultContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -54,6 +63,9 @@
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgb(125, 113, 216);
   border: 1px solid transparent;
@@ -80,6 +92,9 @@
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgb(72, 61, 139);
   border: 1px solid transparent;
@@ -100,6 +115,12 @@
           <family>Inter var</family>
           <pointsize>16</pointsize>
          </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
         </property>
         <property name="styleSheet">
          <string notr="true">background-color: rgb(72, 61, 139);
@@ -128,12 +149,20 @@
           <pointsize>16</pointsize>
          </font>
         </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(125, 113, 216);
-  border: 1px solid transparent;
-  color: #FFFFFF;
-  font-family: &quot;Inter var&quot;,ui-sans-serif,system-ui,-apple-system,system-ui,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Arial,&quot;Noto Sans&quot;,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;,&quot;Noto Color Emoji&quot;;
-</string>
+         <string notr="true">QPushButton#PreviousPageButton {
+background-color: rgb(125, 113, 216);
+color: #FFFFFF;
+border: 1px solid transparent;
+font-family: &quot;Inter var&quot;,ui-sans-serif,system-ui,-apple-system,system-ui,&quot;Segoe UI&quot;,Roboto,&quot;Helvetica Neue&quot;,Arial,&quot;Noto Sans&quot;,sans-serif,&quot;Apple Color Emoji&quot;,&quot;Segoe UI Emoji&quot;,&quot;Segoe UI Symbol&quot;,&quot;Noto Color Emoji&quot;;
+}
+
+QPushButton#PreviousPageButton:hover {
+background-color: #4031b2;
+}</string>
         </property>
         <property name="text">
          <string>Предыдущая страница</string>
@@ -188,7 +217,6 @@
    <addaction name="menu"/>
    <addaction name="menu_2"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
   <action name="menuExit">
    <property name="text">
     <string>Выйти</string>

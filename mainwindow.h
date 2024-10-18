@@ -46,11 +46,14 @@ private:
     QListWidget* navigationList;
 
     QString loadTextFromFile(const QString& filePath);
+    QString loadStyleSheetFromFile(const QString& filePath);
     bool loadDataFromFile(const QString& fileName);
     void restoreNavigationList();
     void showBookmarkList();
     void saveBookmarksToFile();
     void loadBookmarksFromFile();
+    void updateNavigationButtons();
+    void updateBookmarkButton();
 
     QVector<QPair<QString, QString>> bookmarks;
     bool showingBookmarks;

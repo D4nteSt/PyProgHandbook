@@ -1,9 +1,11 @@
 <RCC>
     <qresource prefix="/">
-        <file>texts/introduction.html</file>
-        <file>texts/Test1.html</file>
-        <file>texts/Test2.html</file>
-        <file>texts/Test3.html</file>
+        <file>texts/1.welcome.html</file>
+        <file>texts/2.introduction.html</file>
+        <file>texts/3.downloadPy.html</file>
+        <file>texts/4.dataInOut.html</file>
+        <file>texts/5.variables.html</file>
         <file>data.json</file>
+        <file>style.css</file>
     </qresource>
 </RCC>

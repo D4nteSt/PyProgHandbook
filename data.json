@@ -1,18 +1,22 @@
 [
     {
+        "title": "Добро пожаловать!",
+        "filePath": ":/texts/1.welcome.html"
+    },
+    {
         "title": "Введение",
-        "filePath": ":/texts/introduction.html"
+        "filePath": ":/texts/2.introduction.html"
     },
     {
-        "title": "Элемент 1",
-        "filePath": ":/texts/Test1.html"
+        "title": "Как скачать Python?",
+        "filePath": ":/texts/3.downloadPy.html"
     },
     {
-        "title": "Элемент 2",
-        "filePath": ":/texts/Test2.html"
+        "title": "Ввод и вывод данных",
+        "filePath": ":/texts/4.dataInOut.html"
     },
     {
-        "title": "Элемент 3",
-        "filePath": ":/texts/Test3.html"
+        "title": "Переменные",
+        "filePath": ":/texts/5.variables.html"
     }
 ]
