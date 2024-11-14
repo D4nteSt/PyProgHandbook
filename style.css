@@ -1,3 +1,5 @@
 QTextBrowser {
     background-color: rgb(240, 240, 240);
+    font: 14pt "Arial";
 }
+

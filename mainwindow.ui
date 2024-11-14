@@ -45,7 +45,8 @@
       <item row="0" column="1" colspan="3">
        <widget class="QTextBrowser" name="textBrowser">
         <property name="styleSheet">
-         <string notr="true">background-color: rgb(240, 240, 240);</string>
+         <string notr="true">background-color: rgb(240, 240, 240);
+font: 18pt &quot;Arial&quot;;</string>
         </property>
        </widget>
       </item>
@@ -202,19 +203,12 @@ background-color: #4031b2;
    <property name="styleSheet">
     <string notr="true">background-color: rgb(93, 75, 216);</string>
    </property>
-   <widget class="QMenu" name="menu">
-    <property name="title">
-     <string>Файл</string>
-    </property>
-    <addaction name="menuExit"/>
-   </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>Информация</string>
     </property>
     <addaction name="menuAbout"/>
    </widget>
-   <addaction name="menu"/>
    <addaction name="menu_2"/>
   </widget>
   <action name="menuExit">

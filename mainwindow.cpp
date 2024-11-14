@@ -1,5 +1,34 @@
+/**
+ * @file mainwindow.cpp
+ * @brief Реализация главного окна приложения.
+ *
+ * Этот файл содержит реализацию всех функций, относящихся к главному окну приложения, включая слоты для
+ * обработки действий пользователя, такие как добавление/удаление закладок, навигация по страницам,
+ * отображение информации о программе, выход из приложения и другие. Внутри используются механизмы Qt,
+ * такие как списки, кнопки и окна сообщений, для реализации интерфейса и взаимодействия с пользователем.
+ *
+ * Программа представляет собой справочник по языку программирования Python и позволяет пользователю
+ * легко переключаться между разделами, добавлять закладки на важные страницы.
+ *
+ * Основные функции:
+ * - Обработка кнопок навигации (следующая и предыдущая страницы).
+ * - Добавление и удаление закладок.
+ * - Показ и скрытие списка закладок.
+ * - Управление доступностью кнопок в зависимости от текущего состояния.
+ *
+ * Применяются стили для элементов управления, чтобы улучшить внешний вид приложения.
+ */
+
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
+
+/**
+ * @brief Конструктор класса MainWindow.
+ *
+ * Инициализирует основное окно приложения, загружает данные и закладки, а также настраивает соединения для сигналов и слотов.
+ *
+ * @param parent Родительский объект для QMainWindow.
+ */
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -23,19 +52,29 @@ MainWindow::MainWindow(QWidget *parent)
     if (ui->navigationList->count() > 0)
     {
         ui->navigationList->setCurrentRow(0);
+        updateOpenBookmarksButton();
         updateNavigationButtons();
         updateBookmarkButton();
     }
 
 }
 
+/**
+ * @brief Деконструктор класса MainWindow.
+ *
+ * Сохраняет закладки в файл перед завершением работы приложения
+ */
 MainWindow::~MainWindow()
 {
     saveBookmarksToFile();
     delete ui;
 }
 
-//Функция загрузки файла с сохраненными закладками
+/**
+ * @brief Сохраняет закладки в файл.
+ *
+ * Закладки сохрняются в файл bookmark.json в формате JSON, который содержит значения "title" (название раздела) и "filePath" (путь до HTML файла).
+ */
 void MainWindow::saveBookmarksToFile()
 {
     QString filePath = QCoreApplication::applicationDirPath() + "/bookmarks.json";
@@ -63,7 +102,11 @@ void MainWindow::saveBookmarksToFile()
     qDebug() << "Закладки успешно сохранены в" << filePath;
 }
 
-//Функция загрузки закладок из файла
+/**
+ * @brief Загружает закладки из файла bookmarks.json.
+ *
+ * Закладки считываются из файла bookmarks.json и добавляются в вектор пар bookmarks.
+ */
 void MainWindow::loadBookmarksFromFile()
 {
     QString filePath = QCoreApplication::applicationDirPath() + "/bookmarks.json";
@@ -99,7 +142,13 @@ void MainWindow::loadBookmarksFromFile()
     qDebug() << "Закладки успешно загружены из" << filePath;
 }
 
-// Функция для загрузки данных из JSON файла
+/**
+ * @brief Загружает данные из JSON файла.
+ *
+ * Функция загружает данные из указанного JSON файла и добавляет элементы в список навигации.
+ * @param fileName Имя JSON файла. В нашем случае data.json, который содержит значения "title" (название раздела) и "filePath" (путь до HTML файла).
+ * @return Возвращает true при успешной загрузке файла, иначе false.
+ */
 bool MainWindow::loadDataFromFile(const QString& fileName)
 {
     QFile file(fileName);
@@ -135,7 +184,14 @@ bool MainWindow::loadDataFromFile(const QString& fileName)
     return true;
 }
 
-//Функция для загрузки содержимого css файла
+/**
+ * @brief Загружает содержимое CSS файла.
+ *
+ * Функция читает и возвращает содержимое CSS файла по указанному пути.
+ *
+ * @param filePath Путь к CSS файлу.
+ * @return Содержимое CSS файла в виде строки.
+ */
 QString MainWindow::loadStyleSheetFromFile(const QString &filePath)
 {
     QFile file(filePath);
@@ -151,7 +207,13 @@ QString MainWindow::loadStyleSheetFromFile(const QString &filePath)
     return cssContent;
 }
 
-//Слот, вызываемый при выборе элемента из списка
+/**
+ * @brief Обработчик выбора элемента в списке навигации.
+ *
+ * Загружает содержимое выбранного файла и применяет к нему CSS стили.
+ *
+ * @param currentRow Индекс выбранного элемента в списке.
+ */
 void MainWindow::onNavigationItemSelected(int currentRow)
 {
     QListWidgetItem* currentItem = ui->navigationList->item(currentRow);
@@ -174,7 +236,14 @@ void MainWindow::onNavigationItemSelected(int currentRow)
     updateBookmarkButton();
 }
 
-//Функция для загрузки текста из файла
+/**
+ * @brief Загружает текст из файла.
+ *
+ * Функция читает и возвращает содержимое из файла, в нашем случае HTML, по указанному пути.
+ *
+ * @param filePath Путь к файлу.
+ * @return Содержимое файла в виде строки.
+ */
 QString MainWindow::loadTextFromFile(const QString &filePath)
 {
     QFile file(filePath);
@@ -190,7 +259,11 @@ QString MainWindow::loadTextFromFile(const QString &filePath)
     return fileContent;
 }
 
-//Функция для вывода списка закладок в навигационное меню
+/**
+ * @brief Отображает список закаладок в навигационном меню.
+ *
+ * Добавляет закладки в список навигации, заменяя все существующие разделы.
+ */
 void MainWindow::showBookmarkList()
 {
     ui->navigationList->clear();
@@ -207,14 +280,14 @@ void MainWindow::showBookmarkList()
         ui->navigationList->setCurrentRow(0);
     }
 
-    if (bookmarks.isEmpty())
-    {
-        ui->textBrowser->setText("Пока закладок нет...");
-        return;
-    }
+    updateOpenBookmarksButton();
 }
 
-//Функция для восстановления всех элементов в навигационном меню при скрытии закладок
+/**
+ * @brief Восстанавливает элементы навигационного списка после скрытия закладок.
+ *
+ * Загружает данные из основного JSON файла (data.json) и восстанавливает навигациионный список со всеми разделами.
+ */
 void MainWindow::restoreNavigationList()
 {
     ui->navigationList->clear();
@@ -227,7 +300,15 @@ void MainWindow::restoreNavigationList()
     }
 }
 
-//Слот для кнопки открытия/скрытия списка закладок
+/**
+ * @brief Слот для обработки показа или скрытия списка закладок.
+ *
+ * Меняет булевое значение, отвечающее за флаг открыты ли закладки или нет.
+ *
+ * Открывает список закладок/восстанавливает список всех разделов.
+ * Меняет текст кнопки на "Показать закладки" если они скрыты, в ином случае "Скрыть закладки".
+ * Вызываются фукнции обновления навигационных кнопок и добавления/скрытия закладок.
+ */
 void MainWindow::on_OpenBookmarksButton_clicked()
 {
     if (showingBookmarks)
@@ -246,7 +327,20 @@ void MainWindow::on_OpenBookmarksButton_clicked()
     updateNavigationButtons();
 }
 
-//Слот для кнопки добавления/удаления закладки
+/**
+ * @brief Слот для обработки добавления или удаления закладки.
+ *
+ * Эта функция выполняет добавление текущего элемента в список закладок или удаление,
+ * если элемент уже находится в закладках. Она проверяет, существует ли закладка для текущего
+ * элемента, и если её нет, добавляет её. В противном случае, если закладка отображается
+ * в списке закладок, она удаляется.
+ *
+ * Если закладка добавлена, появляется подтверждение и уведомление об успешном добавлении, если выбрано "Да", иначе программа закрывает диалоговое окно.
+ * Если закладка удалена, также появляется подтверждение и сообщение об успешном удалении, если выбрано "Да", иначе программа так же закрывает окно с диалогом.
+ *
+ * После добавления или удаления закладки функция обновляет интерфейс, включая состояние
+ * кнопок закладок и навигации, а также текст кнопки отображения списка закладок.
+ */
 void MainWindow::on_BookmarkButton_clicked()
 {
     int currentRow = ui->navigationList->currentRow();
@@ -273,48 +367,116 @@ void MainWindow::on_BookmarkButton_clicked()
 
             if (!alreadyBookmarked)
             {
-                bookmarks.append(qMakePair(title, filePath));
-                qDebug() << "Закладка добавлена: " << title;
+                QMessageBox confirmBox;
+                confirmBox.setWindowTitle("Добавить закладку");
+                confirmBox.setText("Вы уверены, что хотите добавить эту страницу в закладки?");
+                confirmBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                confirmBox.setButtonText(QMessageBox::Yes, "Да");
+                confirmBox.setButtonText(QMessageBox::No, "Нет");
+                confirmBox.setIcon(QMessageBox::Question);
 
-                QMessageBox msgbox;
-                msgbox.setText("Закладка успешно добавлена!");
-                msgbox.setWindowTitle("Внимание!");
-                msgbox.setIcon(QMessageBox::Information);
-                msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
-                msgbox.setStandardButtons(QMessageBox::Ok);
-                msgbox.exec();
+                if (confirmBox.exec() == QMessageBox::Yes)
+                {
+                    bookmarks.append(qMakePair(title, filePath));
+                    qDebug() << "Закладка добавлена: " << title;
 
-                updateBookmarkButton();
+                    QMessageBox msgbox;
+                    msgbox.setText("Закладка успешно добавлена!");
+                    msgbox.setWindowTitle("Внимание!");
+                    msgbox.setIcon(QMessageBox::Information);
+                    msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
+                    msgbox.setStandardButtons(QMessageBox::Ok);
+                    msgbox.exec();
+
+                    updateBookmarkButton();
+                }
             }
 
             else if (showingBookmarks)
             {
-                bookmarks.removeAt(bookmarkIndex);
-                delete ui->navigationList->takeItem(currentRow);
-                qDebug() << "Закладка удалена: " << title;
+                    QMessageBox confirmBox;
+                    confirmBox.setWindowTitle("Удалить закладку");
+                    confirmBox.setText("Вы уверены, что хотите удалить эту страницу из закладок?");
+                    confirmBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                    confirmBox.setButtonText(QMessageBox::Yes, "Да");
+                    confirmBox.setButtonText(QMessageBox::No, "Нет");
+                    confirmBox.setIcon(QMessageBox::Question);
 
-                if (bookmarks.isEmpty())
-                {
-                    ui->textBrowser->setText("Пока закладок нет...");
-                }
+                    if (confirmBox.exec() == QMessageBox::Yes)
+                    {
+                        bookmarks.removeAt(bookmarkIndex);
+                        delete ui->navigationList->takeItem(currentRow);
+                        qDebug() << "Закладка удалена: " << title;
 
-                QMessageBox msgbox;
-                msgbox.setText("Закладка успешно удалена!");
-                msgbox.setWindowTitle("Внимание!");
-                msgbox.setIcon(QMessageBox::Information);
-                msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
-                msgbox.setStandardButtons(QMessageBox::Ok);
-                msgbox.exec();
+                        if (bookmarks.isEmpty())
+                        {
+                            restoreNavigationList();
+                            showingBookmarks = false;
+                            ui->OpenBookmarksButton->setText("Показать закладки");
+                        }
 
-                updateBookmarkButton();
+                        QMessageBox msgbox;
+                        msgbox.setText("Закладка успешно удалена!");
+                        msgbox.setWindowTitle("Внимание!");
+                        msgbox.setIcon(QMessageBox::Information);
+                        msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
+                        msgbox.setStandardButtons(QMessageBox::Ok);
+                        msgbox.exec();
+
+                        updateBookmarkButton();
+                    }
             }
+
+            updateOpenBookmarksButton();
+            updateNavigationButtons();
         }
     }
 }
 
-//Функция обновления внешнего вида кнопок добавления/удаления закладок
+/**
+ * @brief Обновляет состояние кнопки "Открыть/Скрыть закладки"
+ *
+ * Эта функция изменяет состояние кнопки "Открыть/Скрыть закладки" в зависимости от наличия закладок.
+ * Если список закладок пуст, кнопка отключается и ей назначается стиль для неактивного состояния.
+ * В противном случае кнопка становится активной и ей назначается стиль для активного состояния.
+ *
+ */
+void MainWindow::updateOpenBookmarksButton()
+{
+    QString bookmarksButtonStyle = "background-color: rgb(72, 61, 139); border-radius: 10px; border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";";
+    QString bookmarksButtonDisabledStyle = "background-color: #231b62; color: #a9a9a9; border-radius: 10px;";
+
+    if (bookmarks.isEmpty())
+    {
+        ui->OpenBookmarksButton->setEnabled(false);
+        ui->OpenBookmarksButton->setStyleSheet(bookmarksButtonDisabledStyle);
+    }
+    else
+    {
+        ui->OpenBookmarksButton->setEnabled(true);
+        ui->OpenBookmarksButton->setStyleSheet(bookmarksButtonStyle);
+    }
+}
+
+/**
+ * @brief Обновляет внешний вид и состояние кнопки "Добавить/Удалить закладку".
+ *
+ * Функция обновляет текст и доступность кнопки "Добавить/Удалить закладку" в зависимости от
+ * текущего элемента списка навигации и наличия этого элемента в списке закладок.
+ *
+ * Если текущий элемент уже добавлен в закладки и список закладок отображается,
+ * то кнопка предлагает удалить этот элемент из закладок.
+ * Если элемент уже добавлен в закладки, но список закладок не отображается,
+ * кнопка становится неактивной.
+ *
+ * Если элемент не добавлен в закладки, кнопка становится активной и предлагает добавить его в закладки.
+ *
+ */
 void MainWindow::updateBookmarkButton()
 {
+    QString bookmarksButtonStyle = "background-color: rgb(72, 61, 139); border-radius: 10px; border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";";
+    QString bookmarksButtonDisabledStyle = "background-color: #231b62; color: #a9a9a9; border-radius: 10px;";
+
     int currentRow = ui->navigationList->currentRow();
     if (currentRow < 0) {
         return;
@@ -341,49 +503,70 @@ void MainWindow::updateBookmarkButton()
     {
         ui->BookmarkButton->setText("Удалить из закладок");
         ui->BookmarkButton->setEnabled(true);
-        ui->BookmarkButton->setStyleSheet("background-color: rgb(72, 61, 139); border-radius: 10px; border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+        ui->BookmarkButton->setStyleSheet(bookmarksButtonStyle);
     }
     else if (alreadyBookmarked && !showingBookmarks)
     {
         ui->BookmarkButton->setText("Добавить в закладки");
         ui->BookmarkButton->setEnabled(false);
-        ui->BookmarkButton->setStyleSheet("background-color: #231e44; color: #a9a9a9; border-radius: 10px;");
+        ui->BookmarkButton->setStyleSheet(bookmarksButtonDisabledStyle);
     }
     else if (!alreadyBookmarked)
     {
         ui->BookmarkButton->setText("Добавить в закладки");
         ui->BookmarkButton->setEnabled(true);
-        ui->BookmarkButton->setStyleSheet("background-color: rgb(72, 61, 139); border-radius: 10px; border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+        ui->BookmarkButton->setStyleSheet(bookmarksButtonStyle);
     }
 }
 
-//Функция обновления внешнего вида навигационных кнопок
+/**
+ * @brief Обновляет внешний вид и состояние кнопок навигации ("Предыдущая страница" и "Следующая страница").
+ *
+ * Функция проверяет, есть ли предыдущие и последующие элементы в списке навигации (ui->navigationList),
+ * и на основе этого активирует или деактивирует кнопки навигации.
+ *
+ * Если текущий элемент не первый в списке, кнопка "Предыдущая страница" становится активной и применяет
+ * стиль для активной кнопки. Если элемент первый, кнопка деактивируется и применяет стиль для неактивной кнопки.
+ *
+ * Аналогично, если текущий элемент не последний в списке, кнопка "Следующая страница" активируется,
+ * в противном случае она становится неактивной.
+ *
+ */
 void MainWindow::updateNavigationButtons()
 {
+    QString navigationButtonsStyle = "background-color: rgb(125, 113, 216); border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";";
+    QString navigationButtonsDisabledStyle = "background-color: #231e44; color: #a9a9a9; border-radius: 10px;";
+
     if (ui->navigationList->currentRow() > 0)
     {
         ui->PreviousPageButton->setEnabled(true);
-        ui->PreviousPageButton->setStyleSheet("background-color: rgb(125, 113, 216); border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+        ui->PreviousPageButton->setStyleSheet(navigationButtonsStyle);
     }
     else
     {
         ui->PreviousPageButton->setEnabled(false);
-        ui->PreviousPageButton->setStyleSheet("background-color: #231b62; color: #a9a9a9;");
+        ui->PreviousPageButton->setStyleSheet(navigationButtonsDisabledStyle);
     }
 
     if (ui->navigationList->currentRow() < ui->navigationList->count() - 1)
     {
         ui->NextPageButton->setEnabled(true);
-        ui->NextPageButton->setStyleSheet("background-color: rgb(125, 113, 216); border: 1px solid transparent; color: #FFFFFF; font-family: \"Inter var\",ui-sans-serif,system-ui,-apple-system,system-ui,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";");
+        ui->NextPageButton->setStyleSheet(navigationButtonsStyle);
     }
     else
     {
         ui->NextPageButton->setEnabled(false);
-        ui->NextPageButton->setStyleSheet("background-color: #231b62; color: #a9a9a9;");
+        ui->NextPageButton->setStyleSheet(navigationButtonsDisabledStyle);
     }
 }
 
-//Слот для кнопки следующей страницы
+/**
+ * @brief Слот, вызываемый при нажатии кнопки "Следующая страница".
+ *
+ * Функция перемещает выделение в списке (ui->navigationList) на следующий элемент,
+ * если текущий элемент не является последним. После этого обновляется состояние
+ * кнопок навигации для синхронизации их активности (вызов updateNavigationButtons()).
+ */
 void MainWindow::on_NextPageButton_clicked()
 {
     int currentRow = ui->navigationList->currentRow();
@@ -395,7 +578,13 @@ void MainWindow::on_NextPageButton_clicked()
     updateNavigationButtons();
 }
 
-//Слот для кнопки предыдущей страницы
+/**
+ * @brief Слот, вызываемый при нажатии кнопки "Предыдущая страница".
+ *
+ * Функция перемещает выделение в списке (ui->navigationList) на предыдущий элемент,
+ * если текущий элемент не является первым. После этого обновляется состояние
+ * кнопок навигации для синхронизации их активности (вызов updateNavigationButtons()).
+ */
 void MainWindow::on_PreviousPageButton_clicked()
 {
     int currentRow = ui->navigationList->currentRow();
@@ -407,26 +596,40 @@ void MainWindow::on_PreviousPageButton_clicked()
     updateNavigationButtons();
 }
 
-void MainWindow::on_menuExit_triggered()
+/**
+ * @brief Слот подтверждения о выходе.
+ *
+ * Функция показывает диалоговое окно с подтверждением выхода из программы. Если пользователь
+ * выбирает "Да", программа завершает работу. Если выбрано "Отмена",
+ * окно закрывается без выхода.
+ */
+void MainWindow::closeEvent(QCloseEvent *event)
 {
-    QMessageBox msgbox;
-    msgbox.setText("Вы уверены, что хотите выйти?");
-    msgbox.setWindowTitle("Выход");
-    msgbox.setIcon(QMessageBox::Warning);
-    msgbox.setStyleSheet("background-color: rgb(240, 240, 240);");
-    msgbox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
-    int answer = msgbox.exec();
+    QMessageBox msgBox;
+    msgBox.setWindowTitle("Выход");
+    msgBox.setText("Вы уверены, что хотите выйти?");
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::No);
+    msgBox.setButtonText(QMessageBox::Yes, "Да");
+    msgBox.setButtonText(QMessageBox::No, "Нет");
 
-    switch (answer) {
-    case QMessageBox::Yes:
-        QApplication::exit();
-        break;
-
-    case QMessageBox::Cancel:
-        break;
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::Yes)
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
     }
 }
 
+/**
+ * @brief Слот для пункта меню "О программе".
+ *
+ * Показывает диалоговое окно с информацией о программе.
+ */
 void MainWindow::on_menuAbout_triggered()
 {
     QMessageBox msgbox;
