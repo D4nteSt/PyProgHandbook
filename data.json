@@ -8,55 +8,15 @@
         "filePath": ":/texts/2.introduction.html"
     },
     {
+        "title": "Как скачать Python?",
+        "filePath": ":/texts/3.downloadPy.html"
+    },
+    {
         "title": "Ввод и вывод данных",
-        "filePath": ":/texts/3.dataInOut.html"
+        "filePath": ":/texts/4.dataInOut.html"
     },
     {
         "title": "Переменные",
-        "filePath": ":/texts/4.variables.html"
-    },
-    {
-        "title": "Условный оператор",
-        "filePath": ":/texts/5.ifElse.html"
-    },
-    {
-        "title": "Циклы",
-        "filePath": ":/texts/6.while.html"
-    },
-    {
-        "title": "Вычисления",
-        "filePath": ":/texts/7.calculations.html"
-    },
-    {
-        "title": "Строки",
-        "filePath": ":/texts/8.string.html"
-    },
-    {
-        "title": "Списки",
-        "filePath": ":/texts/9.list.html"
-    },
-    {
-        "title": "Функции и рекурсия",
-        "filePath": ":/texts/10.funcAndRecurs.html"
-    },
-    {
-        "title": "Двумерные массивы",
-        "filePath": ":/texts/11.2dArray.html"
-    },
-    {
-        "title": "Множества",
-        "filePath": ":/texts/12.set.html"
-    },
-    {
-        "title": "Словари",
-        "filePath": ":/texts/13.dict.html"
-    },
-    {
-        "title": "Задачи",
-        "filePath": ":/texts/14.problems.html"
-    },
-    {
-        "title": "Решения задач",
-        "filePath": ":/texts/15.solution.html"
+        "filePath": ":/texts/5.variables.html"
     }
 ]
