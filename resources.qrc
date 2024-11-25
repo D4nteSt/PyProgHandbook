@@ -2,10 +2,20 @@
     <qresource prefix="/">
         <file>texts/1.welcome.html</file>
         <file>texts/2.introduction.html</file>
-        <file>texts/3.downloadPy.html</file>
-        <file>texts/4.dataInOut.html</file>
-        <file>texts/5.variables.html</file>
         <file>data.json</file>
         <file>style.css</file>
+        <file>texts/3.dataInOut.html</file>
+        <file>texts/4.variables.html</file>
+        <file>texts/5.ifElse.html</file>
+        <file>texts/6.while.html</file>
+        <file>texts/7.calculations.html</file>
+        <file>texts/8.string.html</file>
+        <file>texts/9.list.html</file>
+        <file>texts/10.funcAndRecurs.html</file>
+        <file>texts/11.2dArray.html</file>
+        <file>texts/12.set.html</file>
+        <file>texts/13.dict.html</file>
+        <file>texts/14.problems.html</file>
+        <file>texts/15.solution.html</file>
     </qresource>
 </RCC>
