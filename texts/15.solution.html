@@ -1,0 +1,130 @@
+<style>
+    code {
+      font-family: Consolas,"courier new";
+      color: rgb(0, 0, 0);
+      background-color: #f1f1f1;
+      padding: 2px;
+      font-size: 105%;
+    }
+</style>
+<h1>Решения задач</h1>
+<h2>Задача №1. Вычислите умножение и сумму двух чисел</h2>
+<code>
+    <pre>
+a = int(input()) 
+b = int(input()) 
+def product(num1,num2):
+    resultum = num1 * num2 
+    if resultum >= 1000: 
+        print(resultum)
+    else:
+        print(num1+num2)
+product(a,b)
+    </pre>
+</code>
+<h2>Задача №2. Сумма текущего и предыдущего числа</h2>
+<code>
+    <pre>
+print('Печать текущей и предыдущей суммы чисел в диапазоне (10)')
+num_prev = 0
+
+for i in range(10):
+    x_sum = num_prev + i
+    print(f'Текущее число {i}, предыдущее число {num_prev}, сумма чисел {x_sum}')
+    num_prev = i
+
+    </pre>
+</code>
+<h2>Задача №3. Четные символы строки</h2>
+<code>
+    <pre>
+print('Печать текущей и предыдущей суммы чисел в диапазоне (10)')
+str = input()
+strlen = len(str)
+
+for i in range(0,strlen,2):
+    print(str[i])
+
+    </pre>
+</code>
+<h2>Задача №4. Удалить первые символы строки</h2>
+<code>
+    <pre>
+str = input('Введите строку')
+strremove = int(input('Введите количество символов для удаления'))
+def wordstr(str,n):
+    x = str[n:]
+    print(x)
+wordstr(str,strremove)
+    
+    </pre>
+</code>
+<h2>Задача №5. Совпадает ли первый и последний номер в списке?</h2>
+<code>
+    <pre>
+list = [10,20,30,40,50,30]
+print(list[0],'Значение первого индекса')
+print(list[-1],'Значение последнего индекса')
+def listsearch(list):
+    if list[0] == list[-1]:
+        print(True)
+    else:
+        print(False)
+listsearch(list)
+
+    </pre>
+</code>
+<h2>Задача №6. Вывести из списка числа, кратные 5</h2>
+<code>
+    <pre>
+list = [10,20,16,40,21,30]
+def listx(list):
+    for i in list:
+        if i % 5 == 0:
+            print(i)
+listx(list)
+
+    </pre>
+</code>
+<h2>Задача №7. Вхождение подстроки в строку</h2>
+<code>
+    <pre>
+str_x = "Вася хороший программист. Будь как Вася"
+count = 0
+xstr = str_x.split()
+for i in xstr:
+    if i == 'Вася':
+        count = count + 1
+print(f'Вася появился в строке {count} раз')
+
+    </pre>
+</code>
+
+<h2>Задача №8. Распечатайте цифры</h2>
+<code>
+    <pre>
+for i in range(6):
+    for j in range(i):
+        print(i, end=' ')
+    print('\n')
+
+    </pre>
+</code>
+
+<h2>Задача №9. Новый список из двух списков</h2>
+<code>
+    <pre>
+list1=[10,20,30,45,75]
+list2=[35,65,40,50,60]
+list3 = []
+
+for i in list1:
+    if i % 2 != 0:
+        list3.append(i)
+for j in list2:
+    if j % 2 == 0:
+        list3.append(j)
+print(list3)
+
+    </pre>
+</code>
